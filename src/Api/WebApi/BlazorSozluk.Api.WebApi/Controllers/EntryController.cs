@@ -1,4 +1,6 @@
-﻿using BlazorSozluk.Common.Models.RequestModels;
+﻿using BlazorSozluk.Api.Application.Features.Queries.GetEntries;
+using BlazorSozluk.Api.Application.Features.Queries.GetMainPageEntries;
+using BlazorSozluk.Common.Models.RequestModels;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +18,25 @@ public class EntryController : BaseController
         _mediator = mediator;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetEntries([FromQuery] GetEntriesQuery query)
+    {
+        var entries = await _mediator.Send(query);
+        return Ok(entries);
+    }
+
+    [HttpGet("MainPageEntries")]
+    public async Task<IActionResult> GetMainPageEntries(int page, int pageSize)
+    {
+        var entries = await _mediator.Send(new GetMainPageEntriesQuery(page, pageSize, UserId));
+        return Ok(entries);
+    }
+
     [HttpPost("CreateEntry")]
     public async Task<IActionResult> CreateEntry(CreateEntryCommand command)
     {
         if (!command.CreatedById.HasValue)
-                command.CreatedById = UserId;
+            command.CreatedById = UserId;
 
         var result = await _mediator.Send(command);
 
@@ -31,7 +47,7 @@ public class EntryController : BaseController
     public async Task<IActionResult> CreateCommentEntry(CreateEntryCommentCommand command)
     {
         if (!command.CreatedById.HasValue)
-             command.CreatedById = UserId;
+            command.CreatedById = UserId;
 
 
         var result = await _mediator.Send(command);
