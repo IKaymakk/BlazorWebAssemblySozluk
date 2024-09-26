@@ -5,7 +5,7 @@ using System.Security.Claims;
 namespace BlazorSozluk.Api.WebApi.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController] 
     public class BaseController : ControllerBase
     {
         public Guid? UserId => Guid.NewGuid();  //new(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
