@@ -22,31 +22,4 @@ public class GetUserEntriesQueryHandler : IRequestHandler<GetUserEntriesQuery, P
         _entryRepository = entryRepository;
     }
 
-    public async Task<PagedViewModel<GetUserEntriesDetailViewModel>> Handle(GetUserEntriesQuery request, CancellationToken cancellationToken)
-    {
-        var query = _entryRepository.AsQueryable();
-
-        if (request.UserId != null && request.UserId.HasValue && request.UserId != Guid.Empty)
-            query = query.Where(entry => entry.CreatedById == request.UserId);
-
-        else if (!string.IsNullOrEmpty(request.UserName))
-            query = query.Where(entry => entry.CreatedBy.UserName == request.UserName);
-
-        else return null;
-
-        query = query.Include(entry => entry.CreatedBy).Include(entry => entry.EntryFavorites);
-
-        var list = query.Select(x => new GetUserEntriesDetailViewModel
-        {
-            Content = x.Content,
-            CreatedByUserName = x.CreatedBy.UserName,
-            CreatedDate = x.CreateDate,
-            FavoritedCount = x.EntryFavorites.Count,
-            Id = x.Id,
-            IsFavorited = false,
-            Subject = x.Subject
-        });
-
-        return await list.GetPaged(request.Page, request.PageSize);
-    }
 }
